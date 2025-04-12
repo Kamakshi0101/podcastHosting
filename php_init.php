@@ -1,4 +1,4 @@
-<?php
+       <?php
 // Database Initialization Script
 // This script will automatically create all the tables needed for the podcast application
 

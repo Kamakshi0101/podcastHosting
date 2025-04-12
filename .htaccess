@@ -1,0 +1,5 @@
+DirectoryIndex landing.html index.php
+
+RewriteEngine On
+RewriteRule ^$ landing.html [L]
+RewriteRule ^index\.php$ landing.html [L,R=301]

@@ -34,7 +34,7 @@ $full_name = $_SESSION['first_name'] . (isset($_SESSION['last_name']) ? ' ' . $_
     <style>
         .sidebar {
             transition: transform 0.3s ease-in-out;
-            background: linear-gradient(180deg, #4A1E73 0%, #D76D77 100%);
+            background: linear-gradient(180deg, #1a1625 0%, #2d1f3d 50%, #2d2442 100%);
         }
         .sidebar-hidden {
             transform: translateX(-100%);
@@ -79,7 +79,7 @@ $full_name = $_SESSION['first_name'] . (isset($_SESSION['last_name']) ? ' ' . $_
             <nav>
                 <ul class="space-y-6">
                     <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
+                        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-gradient-to-r from-[#4A1E73] to-[#D76D77]">
                             <span class="material-icons">home</span>
                             <span>Home</span>
                         </a>
@@ -176,7 +176,7 @@ $full_name = $_SESSION['first_name'] . (isset($_SESSION['last_name']) ? ' ' . $_
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
             <?php if ($result->num_rows > 0): ?>
-                <div class="bg-[#2E2E4E] p-6 rounded-lg shadow-lg cursor-pointer" onclick="openMediaModal('<?php echo $row['file_path']; ?>', '<?php echo pathinfo($row['file_path'], PATHINFO_EXTENSION) === 'mp4' ? 'video' : 'audio'; ?>', '<?php echo htmlspecialchars($row['title']); ?>')">
+                <div class="bg-[#2E2E4E] p-6 rounded-lg shadow-lg cursor-pointer" onclick="openMediaModal('<?php echo $row['file_path']; ?>', '<?php echo pathinfo($row['file_path'], PATHINFO_EXTENSION) === 'mp4' ? 'video' : 'audio'; ?>', '<?php echo htmlspecialchars($row['title']); ?>', <?php echo $row['id']; ?>)">
                     <div class="flex flex-col space-y-4">
                         <?php if (!empty($row['thumbnail'])): ?>
                             <img src="uploads/<?php echo $row['thumbnail']; ?>" alt="Podcast Thumbnail" class="w-full h-48 object-cover rounded-lg mb-4">
@@ -337,7 +337,7 @@ $full_name = $_SESSION['first_name'] . (isset($_SESSION['last_name']) ? ' ' . $_
             });
         }
 
-        function openMediaModal(filePath, mediaType, title) {
+        function openMediaModal(filePath, mediaType, title, episodeId) {
             const container = document.getElementById('mediaContainer');
             container.innerHTML = mediaType === 'video' 
                 ? `<video class="w-full rounded-lg" controls autoplay>
@@ -349,6 +349,28 @@ $full_name = $_SESSION['first_name'] . (isset($_SESSION['last_name']) ? ' ' . $_
             
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('mediaModal').classList.remove('hidden');
+            
+            // Track play when media is opened
+            trackPlay(episodeId);
+        }
+
+        function trackPlay(episodeId) {
+            fetch('track_play.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `episode_id=${encodeURIComponent(episodeId)}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status !== 'success') {
+                    console.error('Error tracking play:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
 
         function closeMediaModal() {

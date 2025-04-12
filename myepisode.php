@@ -43,10 +43,21 @@ $result = $conn->query($sql);
     <style>
         .sidebar {
             transition: transform 0.3s ease-in-out;
-            background: linear-gradient(180deg, #4A1E73 0%, #D76D77 100%);
+            background: linear-gradient(180deg, #1a1625 0%, #2d1f3d 50%, #2d2442 100%);
         }
         .sidebar-hidden { transform: translateX(-100%); }
         .sidebar-visible { transform: translateX(0); }
+        .sidebar nav ul li a {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar nav ul li a:hover {
+            background: linear-gradient(90deg, rgba(74, 30, 115, 0.8) 0%, rgba(215, 109, 119, 0.8) 100%);
+        }
+        .sidebar nav ul li a.active {
+            background: linear-gradient(90deg, rgba(74, 30, 115, 0.8) 0%, rgba(215, 109, 119, 0.8) 100%);
+        }
         .toggle-moved {
             transform: translateX(16rem) translateY(-50%);
             transition: transform 0.3s ease-in-out;
@@ -114,7 +125,7 @@ $result = $conn->query($sql);
                         </a>
                     </li>
                     <li>
-                        <a href="myepisode.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/10">
+                        <a href="myepisode.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-gradient-to-r from-[#4A1E73] to-[#D76D77]">
                             <span class="material-icons">mic</span>
                             <span>My Episodes</span>
                         </a>

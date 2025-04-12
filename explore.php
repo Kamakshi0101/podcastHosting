@@ -7,7 +7,18 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$user_id = $_SESSION['user_id'];
 $full_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
+
+// Fetch dashboard images
+$dashboard_images = [];
+$stmt = $conn->prepare("SELECT * FROM dashboard_images WHERE user_id = ? ORDER BY display_order, created_at DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $dashboard_images[] = $row;
+}
 ?>
 
 <!DOCTYPE html>
@@ -50,7 +61,10 @@ $full_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
         }
         .sidebar {
             transition: transform 0.3s ease-in-out;
-            background: linear-gradient(180deg, #4A1E73 0%, #D76D77 100%);
+            background: linear-gradient(180deg, #1a1625 0%, #2d1f3d 50%, #2d2442 100%);
+        }
+        .sidebar a.bg-white\/10 {
+            background: linear-gradient(90deg, #4A1E73 0%, #D76D77 100%);
         }
         .sidebar-hidden { transform: translateX(-100%); }
         .sidebar-visible { transform: translateX(0); }
@@ -76,7 +90,13 @@ $full_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
     <div class="flex h-screen relative">
         <aside id="sidebar" class="sidebar w-64 text-white p-8 fixed h-full z-20 sidebar-visible">
             <div class="flex items-center gap-3 mb-8">
-                <span class="material-icons text-4xl">account_circle</span>
+                <?php if (!empty($dashboard_images)): ?>
+                    <img src="uploads/dashboard/<?php echo htmlspecialchars($dashboard_images[0]['image_path']); ?>" 
+                         alt="Profile Image" 
+                         class="w-12 h-12 rounded-full object-cover">
+                <?php else: ?>
+                    <span class="material-icons text-4xl">account_circle</span>
+                <?php endif; ?>
                 <h1 class="text-2xl font-bold"><?php echo htmlspecialchars($full_name); ?></h1>
             </div>
             <nav>
@@ -111,12 +131,7 @@ $full_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
                             <span>New Podcast</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
-                            <span class="material-icons">forum</span>
-                            <span>Forum</span>
-                        </a>
-                    </li>
+
                     <li>
                         <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/10">
                             <span class="material-icons">explore</span>
@@ -124,9 +139,15 @@ $full_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
+                        <a href="settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
                             <span class="material-icons">settings</span>
                             <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="signin.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors mt-auto">
+                            <span class="material-icons">logout</span>
+                            <span>Logout</span>
                         </a>
                     </li>
                 </ul>
@@ -205,7 +226,7 @@ $result = mysqli_query($conn, "SELECT episodes.*, users.username FROM episodes J
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 <?php if (mysqli_num_rows($result) > 0): ?>
     <?php while ($row = mysqli_fetch_assoc($result)): ?>
-    <div class="bg-[#2E2E4E] p-6 rounded-lg shadow-lg cursor-pointer" onclick="openMediaModal('<?php echo $row['file_path']; ?>', '<?php echo pathinfo($row['file_path'], PATHINFO_EXTENSION) === 'mp4' ? 'video' : 'audio'; ?>', '<?php echo htmlspecialchars($row['title']); ?>')">
+    <div class="bg-[#2E2E4E] p-6 rounded-lg shadow-lg cursor-pointer" onclick="openMediaModal('<?php echo $row['file_path']; ?>', '<?php echo pathinfo($row['file_path'], PATHINFO_EXTENSION) === 'mp4' ? 'video' : 'audio'; ?>', '<?php echo htmlspecialchars($row['title']); ?>', <?php echo $row['id']; ?>)">
         <div class="flex flex-col space-y-4">
             <?php if (!empty($row['thumbnail'])): ?>
                 <img src="uploads/<?php echo $row['thumbnail']; ?>" alt="Podcast Thumbnail" class="w-full h-48 object-cover rounded-lg mb-4">
@@ -315,7 +336,7 @@ $result = mysqli_query($conn, "SELECT episodes.*, users.username FROM episodes J
 </div>
 
 <script>
-function openMediaModal(filePath, mediaType, title) {
+function openMediaModal(filePath, mediaType, title, episodeId) {
     const container = document.getElementById('mediaContainer');
     container.innerHTML = mediaType === 'video' 
         ? `<video class="w-full rounded-lg" controls autoplay>
@@ -327,6 +348,28 @@ function openMediaModal(filePath, mediaType, title) {
     
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('mediaModal').classList.remove('hidden');
+    
+    // Track play when media is opened
+    trackPlay(episodeId);
+}
+
+function trackPlay(episodeId) {
+    fetch('track_play.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `episode_id=${encodeURIComponent(episodeId)}`,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'success') {
+            console.error('Error tracking play:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
 function closeMediaModal() {
@@ -342,3 +385,8 @@ window.addEventListener('click', (e) => {
 
 </body>
 </html>
+
+$episode_id = $_GET['episode_id'];
+$stmt = $conn->prepare("INSERT INTO plays (episode_id, user_id) VALUES (?, ?)");
+$stmt->bind_param('ii', $episode_id, $user_id);
+$stmt->execute();

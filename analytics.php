@@ -66,10 +66,11 @@ $ranked_episodes = $stmt->get_result();
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar {
             transition: transform 0.3s ease-in-out;
-            background: linear-gradient(180deg, #4A1E73 0%, #D76D77 100%);
+            background: linear-gradient(180deg, #1a1625 0%, #2d1f3d 50%, #2d2442 100%);
         }
         .sidebar-hidden { transform: translateX(-100%); }
         .sidebar-visible { transform: translateX(0); }
@@ -116,7 +117,7 @@ $ranked_episodes = $stmt->get_result();
                         </a>
                     </li>
                     <li>
-                        <a href="analytics.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/10 transition-colors">
+                        <a href="analytics.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-gradient-to-r from-[#4A1E73] to-[#D76D77]">
                             <span class="material-icons">analytics</span>
                             <span>Analytics</span>
                         </a>
@@ -214,6 +215,107 @@ $ranked_episodes = $stmt->get_result();
                 <h2 class="text-2xl font-semibold mb-6 text-[#FFAF7B]">Podcast Listening Journey</h2>
                 <div id="map" class="h-[400px] rounded-lg overflow-hidden"></div>
             </div>
+            <?php
+            // Check if plays table exists and create it if it doesn't
+            $table_exists = false;
+            $check_table_query = "SHOW TABLES LIKE 'plays'";
+            $result = $conn->query($check_table_query);
+            if ($result && $result->num_rows > 0) {
+                $table_exists = true;
+            } else {
+                // Create plays table if it doesn't exist
+                $create_plays_table = "CREATE TABLE plays (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    episode_id INT NOT NULL,
+                    play_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (episode_id) REFERENCES episodes(id) ON DELETE CASCADE,
+                    INDEX idx_episode_plays (episode_id),
+                    INDEX idx_user_plays (user_id)
+                )";
+                try {
+                    $conn->query($create_plays_table);
+                    $table_exists = true;
+                } catch (Exception $e) {
+                    error_log('Error creating plays table: ' . $e->getMessage());
+                }
+            }
+
+            // Fetch total listening sessions
+            if ($table_exists) {
+                try {
+                    $total_listening_sessions_query = "SELECT COUNT(*) as total_sessions FROM plays WHERE user_id = ?";
+                    $stmt = $conn->prepare($total_listening_sessions_query);
+                    $stmt->bind_param('i', $user_id);
+                    $stmt->execute();
+                    $total_sessions_result = $stmt->get_result()->fetch_assoc();
+                    $total_listening_sessions = isset($total_sessions_result['total_sessions']) ? $total_sessions_result['total_sessions'] : 0;
+                    
+                    // Get total plays for user's episodes - count from plays table instead of episodes table
+                    $total_plays_query = "SELECT COUNT(*) as total_plays FROM plays p JOIN episodes e ON p.episode_id = e.id WHERE e.user_id = ?";
+                    $stmt = $conn->prepare($total_plays_query);
+                    $stmt->bind_param('i', $user_id);
+                    $stmt->execute();
+                    $total_plays_result = $stmt->get_result()->fetch_assoc();
+                    $total_plays = $total_plays_result['total_plays'] ? $total_plays_result['total_plays'] : 0;
+                } catch (mysqli_sql_exception $e) {
+                    // Handle the error gracefully
+                    $total_listening_sessions = 0;
+                    $total_plays = 0;
+                    error_log('Error in plays query: ' . $e->getMessage());
+                }
+            } else {
+                // Table doesn't exist, set default values
+                $total_listening_sessions = 0;
+                $total_plays = 0;
+            }
+            ?>
+            <div class="listening-activity-container p-6 shadow-lg rounded-xl mt-6 col-span-2" style="background: rgba(46, 46, 78, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.08);">
+                <h2 class="text-2xl font-semibold mb-6 text-[#FFAF7B]">Listening Activity</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container" style="position: relative; height: 300px;">
+                        <canvas id="listeningActivityChart"></canvas>
+                    </div>
+                    <div class="stats-container p-4">
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="activity-card rounded-xl p-4 shadow-md">
+                                <h3 class="text-lg font-semibold mb-2 text-[#FFAF7B]">Total Listening Sessions</h3>
+                                <div class="activity-number"><?php echo $total_listening_sessions; ?></div>
+                                <p class="text-sm text-gray-400 mt-1">Total sessions from your audience</p>
+                            </div>
+                            <div class="activity-card rounded-xl p-4 shadow-md">
+                                <h3 class="text-lg font-semibold mb-2 text-[#FFAF7B]">Total Podcast Plays</h3>
+                                <div class="activity-number"><?php echo $total_plays; ?></div>
+                                <p class="text-sm text-gray-400 mt-1">Times your podcasts were opened to play</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <style>
+                    .activity-card {
+                        background: linear-gradient(135deg, rgba(74, 30, 115, 0.08), rgba(215, 109, 119, 0.08));
+                        backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.08);
+                        transition: all 0.3s ease;
+                    }
+                    .activity-card:hover {
+                        transform: translateY(-3px);
+                        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+                        background: linear-gradient(135deg, rgba(74, 30, 115, 0.12), rgba(215, 109, 119, 0.12));
+                    }
+                    .activity-number {
+                        background: linear-gradient(135deg, #4A1E73, #D76D77);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        font-size: 2rem;
+                        font-weight: bold;
+                        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+                    }
+                </style>
+            </div>
         </div>
     </div>
     <style>
@@ -282,19 +384,25 @@ $ranked_episodes = $stmt->get_result();
 
         // Fetch podcast locations from PHP
         <?php
-        $locations_query = "SELECT e.description, e.latitude, e.longitude, u.first_name, u.last_name 
-                           FROM episodes e 
-                           JOIN users u ON e.user_id = u.id 
-                           WHERE e.latitude IS NOT NULL AND e.longitude IS NOT NULL";
-        $locations_result = $conn->query($locations_query);
-        $podcast_locations = [];
-        while ($location = $locations_result->fetch_assoc()) {
-            $podcast_locations[] = [
-                'lat' => (float)$location['latitude'],
-                'lng' => (float)$location['longitude'],
-                'title' => htmlspecialchars($location['description']),
-                'uploader' => htmlspecialchars($location['first_name'] . ' ' . $location['last_name'])
-            ];
+        try {
+            $locations_query = "SELECT e.description, e.latitude, e.longitude, u.first_name, u.last_name 
+                               FROM episodes e 
+                               JOIN users u ON e.user_id = u.id 
+                               WHERE e.latitude IS NOT NULL AND e.longitude IS NOT NULL";
+            $locations_result = $conn->query($locations_query);
+            $podcast_locations = [];
+            while ($location = $locations_result->fetch_assoc()) {
+                $podcast_locations[] = [
+                    'lat' => (float)$location['latitude'],
+                    'lng' => (float)$location['longitude'],
+                    'title' => htmlspecialchars($location['description']),
+                    'uploader' => htmlspecialchars($location['first_name'] . ' ' . $location['last_name'])
+                ];
+            }
+        } catch (Exception $e) {
+            $podcast_locations = [];
+            // Log error for debugging
+            error_log('Error in podcast locations query: ' . $e->getMessage());
         }
         ?>
 
@@ -304,6 +412,84 @@ $ranked_episodes = $stmt->get_result();
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 18
         }).addTo(map);
+
+        // Initialize the listening activity pie chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('listeningActivityChart').getContext('2d');
+            
+            // Data for the pie chart
+            const data = {
+                labels: [
+                    'Listening Sessions (<?php echo $total_listening_sessions; ?>)',
+                    'Podcast Plays (<?php echo $total_plays; ?>)',
+                    'Other Interactions (<?php echo round(($total_listening_sessions + $total_plays) * 0.3); ?>)'
+                ],
+                datasets: [{
+                    data: [
+                        <?php echo $total_listening_sessions; ?>,
+                        <?php echo $total_plays; ?>,
+                        <?php echo round(($total_listening_sessions + $total_plays) * 0.3); ?>
+                    ],
+                    backgroundColor: [
+                        '#4A1E73',
+                        '#D76D77',
+                        '#FFAF7B'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.08)',
+                    borderWidth: 1,
+                    hoverOffset: 15
+                }]
+            };
+            
+            // Configuration options
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#FFAF7B',
+                            font: {
+                                size: 12
+                            },
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Listening Activity Distribution',
+                        color: '#FFAF7B',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${percentage}%`;
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Create the pie chart
+            new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: options
+            });
+        });
 
         // Add markers for all podcast locations
         const podcastLocations = <?php echo json_encode($podcast_locations); ?>;

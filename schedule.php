@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         .sidebar {
             transition: transform 0.3s ease-in-out;
-            background: linear-gradient(180deg, #4A1E73 0%, #D76D77 100%);
+            background: linear-gradient(180deg, #1a1625 0%, #2d1f3d 50%, #2d2442 100%);
         }
         .sidebar-hidden { transform: translateX(-100%); }
         .sidebar-visible { transform: translateX(0); }
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </a>
                     </li>
                     <li>
-                        <a href="schedule.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/10">
+                        <a href="schedule.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-gradient-to-r from-[#4A1E73] to-[#D76D77]">
                             <span class="material-icons">calendar_today</span>
                             <span>Schedule</span>
                         </a>
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
+                        <a href="settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
                             <span class="material-icons">settings</span>
                             <span>Settings</span>
                         </a>

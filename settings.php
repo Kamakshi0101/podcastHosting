@@ -163,9 +163,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['form_type'])) {
     <style>
         .sidebar {
             transition: transform 0.3s ease-in-out;
-            background: linear-gradient(180deg, #4A1E73 0%, #D76D77 100%);
+            background: linear-gradient(180deg, #1a1625 0%, #2d1f3d 50%, #2d2442 100%);
         }
-        .sidebar-hidden { transform: translateX(-100%); }
+        .sidebar a.bg-white\/10 {
+            background: linear-gradient(90deg, #4A1E73 0%, #D76D77 100%);
+        }
+          .sidebar-hidden { transform: translateX(-100%); }
         .sidebar-visible { transform: translateX(0); }
         .toggle-moved {
             transform: translateX(16rem) translateY(-50%);
