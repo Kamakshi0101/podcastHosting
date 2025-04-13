@@ -116,6 +116,12 @@ $full_name = $_SESSION['first_name'] . (isset($_SESSION['last_name']) ? ' ' . $_
                         </a>
                     </li>
                     <li>
+                        <a href="social_impact.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
+                            <span class="material-icons">volunteer_activism</span>
+                            <span>Social Impact</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
                             <span class="material-icons">settings</span>
                             <span>Settings</span>
@@ -136,6 +142,51 @@ $full_name = $_SESSION['first_name'] . (isset($_SESSION['last_name']) ? ' ' . $_
         </button>
 
         <main id="mainContent" class="flex-1 p-10 content-shifted">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                <a href="analytics.php" class="bg-gradient-to-br from-[#4A1E73]/20 to-[#D76D77]/20 p-6 rounded-xl hover:from-[#4A1E73]/30 hover:to-[#D76D77]/30 transition-all duration-300 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-icons text-3xl text-[#FFAF7B] group-hover:scale-110 transition-transform">analytics</span>
+                        <h3 class="text-xl font-semibold">Analytics</h3>
+                    </div>
+                    <p class="text-gray-300">Track your podcast performance with detailed analytics and insights.</p>
+                </a>
+                <a href="schedule.php" class="bg-gradient-to-br from-[#4A1E73]/20 to-[#D76D77]/20 p-6 rounded-xl hover:from-[#4A1E73]/30 hover:to-[#D76D77]/30 transition-all duration-300 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-icons text-3xl text-[#FFAF7B] group-hover:scale-110 transition-transform">calendar_today</span>
+                        <h3 class="text-xl font-semibold">Schedule</h3>
+                    </div>
+                    <p class="text-gray-300">Plan and manage your podcast episodes with our scheduling tools.</p>
+                </a>
+                <a href="myepisode.php" class="bg-gradient-to-br from-[#4A1E73]/20 to-[#D76D77]/20 p-6 rounded-xl hover:from-[#4A1E73]/30 hover:to-[#D76D77]/30 transition-all duration-300 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-icons text-3xl text-[#FFAF7B] group-hover:scale-110 transition-transform">mic</span>
+                        <h3 class="text-xl font-semibold">My Episodes</h3>
+                    </div>
+                    <p class="text-gray-300">Access and manage all your podcast episodes in one place.</p>
+                </a>
+                <a href="new_podcast.php" class="bg-gradient-to-br from-[#4A1E73]/20 to-[#D76D77]/20 p-6 rounded-xl hover:from-[#4A1E73]/30 hover:to-[#D76D77]/30 transition-all duration-300 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-icons text-3xl text-[#FFAF7B] group-hover:scale-110 transition-transform">add_circle</span>
+                        <h3 class="text-xl font-semibold">New Podcast</h3>
+                    </div>
+                    <p class="text-gray-300">Create and upload new podcast episodes with ease.</p>
+                </a>
+                <a href="explore.php" class="bg-gradient-to-br from-[#4A1E73]/20 to-[#D76D77]/20 p-6 rounded-xl hover:from-[#4A1E73]/30 hover:to-[#D76D77]/30 transition-all duration-300 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-icons text-3xl text-[#FFAF7B] group-hover:scale-110 transition-transform">explore</span>
+                        <h3 class="text-xl font-semibold">Explore</h3>
+                    </div>
+                    <p class="text-gray-300">Discover new podcasts and connect with other creators.</p>
+                </a>
+                <a href="social_impact.php" class="bg-gradient-to-br from-[#4A1E73]/20 to-[#D76D77]/20 p-6 rounded-xl hover:from-[#4A1E73]/30 hover:to-[#D76D77]/30 transition-all duration-300 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="material-icons text-3xl text-[#FFAF7B] group-hover:scale-110 transition-transform">volunteer_activism</span>
+                        <h3 class="text-xl font-semibold">Social Impact</h3>
+                    </div>
+                    <p class="text-gray-300">Make a difference with your podcast through NGO collaborations.</p>
+                </a>
+            </div>
+
             <div class="flex justify-between items-center mb-5">
                 <h2 class="text-2xl font-bold">Your Latest Episode</h2>
             </div>

@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS ngo_markers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    latitude DECIMAL(10, 8) NOT NULL,
+    longitude DECIMAL(11, 8) NOT NULL,
+    category VARCHAR(50),
+    contact_info TEXT,
+    website VARCHAR(255),
+    podcast_channel_url VARCHAR(255),
+    featured_episode_id INT,
+    impact_story TEXT,
+    social_reach INT DEFAULT 0,
+    engagement_metrics JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (featured_episode_id) REFERENCES episodes(id) ON DELETE SET NULL
+);

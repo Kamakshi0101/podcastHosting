@@ -119,19 +119,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['form_type'])) {
         $error = 'Please enter a valid email address';
     } else if (!empty($new_password)) {
         // Verify current password
-        $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt = $conn->prepare("SELECT password_hash FROM users WHERE id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
         
-        if (!password_verify($current_password, $user['password'])) {
+        if (!password_verify($current_password, $user['password_hash'])) {
             $error = 'Current password is incorrect';
         } elseif ($new_password !== $confirm_password) {
             $error = 'New passwords do not match';
         } else {
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
             $stmt->bind_param("si", $hashed_password, $user_id);
             $stmt->execute();
         }
@@ -240,6 +240,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['form_type'])) {
                         </a>
                     </li>
                     <li>
+                        <a href="social_impact.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
+                            <span class="material-icons">volunteer_activism</span>
+                            <span>Social Impact</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/10">
                             <span class="material-icons">settings</span>
                             <span>Settings</span>
@@ -333,16 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['form_type'])) {
                             Upload Image
                         </button>
                     </form>
-
-
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-[#D76D77] text-white px-6 py-2 rounded-lg hover:bg-[#C55C66] transition-colors">
-                            Save Changes
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </main>
     </div>

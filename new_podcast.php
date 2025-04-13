@@ -136,6 +136,12 @@ while ($row = $result->fetch_assoc()) {
                         </a>
                     </li>
                     <li>
+                        <a href="social_impact.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
+                            <span class="material-icons">volunteer_activism</span>
+                            <span>Social Impact</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="settings.php" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors">
                             <span class="material-icons">settings</span>
                             <span>Settings</span>
