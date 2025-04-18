@@ -35,9 +35,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In - Podcast Platform</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#1E1E2E] min-h-screen flex items-center justify-center">
+<body class="bg-[#1E1E2E] min-h-screen">
+    <nav>
+        <div class="logo">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#FF4081" stroke-width="4"/>
+                <rect x="15" y="12" width="4" height="16" rx="2" fill="#FF4081"/>
+                <rect x="21" y="8" width="4" height="24" rx="2" fill="#FF4081"/>
+            </svg>
+            <span>PodcastPro</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.php">Home</a>
+            <a href="index.php#about">About Us</a>
+            <a href="index.php#features">Features</a>
+            <a href="index.php#how-it-works">How It Works</a>
+            <a href="index.php#contact">Contact Us</a>
+        </div>
+        <div class="auth-buttons">
+            <button class="login p-2 w-24" onclick="window.location.href='signin.php'">Log in</button>
+            <button class="signup p-2 w-24" onclick="window.location.href='signup.php'">Sign up</button>
+        </div>
+    </nav>
+    
+    <div class="flex items-center justify-center flex-grow pt-20">
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-md mx-auto bg-[#2E2E4E] rounded-lg p-8 shadow-lg text-white">
             <h2 class="text-2xl font-semibold mb-6 text-white">Welcome Back</h2>
@@ -50,12 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="">
                 <div class="mb-4">
-                    <label class="block text-gray-300 text-sm font-bold mb-2" for="signin-username">Username</label>
+                    <label class="block text-[#D76D77] text-sm font-bold mb-2" for="signin-username">Username</label>
                     <input type="text" name="username" id="signin-username" required
                         class="bg-[#1E1E2E] shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:border-[#D76D77] focus:ring-1 focus:ring-[#D76D77]">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-gray-300 text-sm font-bold mb-2" for="signin-password">Password</label>
+                    <label class="block text-[#D76D77] text-sm font-bold mb-2" for="signin-password">Password</label>
                     <input type="password" name="password" id="signin-password" required
                         class="bg-[#1E1E2E] shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:border-[#D76D77] focus:ring-1 focus:ring-[#D76D77]">
                 </div>

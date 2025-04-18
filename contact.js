@@ -2,15 +2,11 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const formProps = Object.fromEntries(formData);
 
     try {
-        const response = await fetch('http://localhost:3000/api/contact', {
+        const response = await fetch('contact_submit.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formProps)
+            body: formData
         });
 
         const data = await response.json();

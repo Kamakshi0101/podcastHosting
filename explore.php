@@ -192,7 +192,7 @@ function handleLike(episodeId, event) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `episode_id=${encodeURIComponent(episodeId)}&user_id=${encodeURIComponent(<?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0'; ?>)}`,
+        body: `episode_id=${encodeURIComponent(episodeId)}`,
     })
     .then(response => response.json())
     .then(data => {
@@ -391,8 +391,3 @@ window.addEventListener('click', (e) => {
 
 </body>
 </html>
-
-$episode_id = $_GET['episode_id'];
-$stmt = $conn->prepare("INSERT INTO plays (episode_id, user_id) VALUES (?, ?)");
-$stmt->bind_param('ii', $episode_id, $user_id);
-$stmt->execute();

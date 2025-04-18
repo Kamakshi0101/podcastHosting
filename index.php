@@ -38,7 +38,7 @@
             <div class="hero-content">
                 <h1>Make your show the next big thing</h1>
                 <p>Powerful tools to manage and grow your audio or video podcast.</p>
-                <button class="get-started">Get started</button>
+                <button class="get-started " onclick="window.location.href='signup.php'">Get started</button>
             </div>
         </div>
 
@@ -146,7 +146,7 @@
                     <button onclick="window.location.href='about.html'" class="more-info-btn">More Info <i class="fas fa-arrow-right"></i></button>
                 </div>
                 <div class="about-image">
-                    <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" alt="Team Collaboration">
+                    <img src="https://images.unsplash.com/photo-1589903308904-1010c2294adc?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" alt="Professional Podcast Studio">
                 </div>
             </div>
         </section>
